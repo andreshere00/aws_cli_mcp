@@ -1,0 +1,13 @@
+[project]
+name = "aws-mcp"
+version = "0.1.0"
+description = "Application to provide methods to communicate AWS with MCP"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "boto3>=1.40.30",
+    "fastmcp>=2.12.3",
+    "openai>=1.107.2",
+    "python-dotenv>=1.1.1",
+    "typer>=0.17.4",
+]

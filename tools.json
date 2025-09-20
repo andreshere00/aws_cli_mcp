@@ -1,0 +1,9 @@
+{
+    "type": "mcp",
+    "server_label": "aws-s3",
+    "server_url": "https://1516d3937edd.ngrok-free.app/mcp/s3",
+    "allowed_tools": [
+        "list_s3_buckets"
+    ],
+    "require_approval": "never"
+}
