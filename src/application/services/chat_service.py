@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from typing import Any, Dict, Iterable, List, Literal, Mapping, Optional, Sequence
-
-from src.infrastructure.mcp import MCPClient
-from src.domain.schemas import ChatTurn, ToolSelection
-from src.domain.utils import to_dict
+from typing import Any, Dict, Iterable, List, Literal, Mapping, Optional, Sequence, Type
 
 from pydantic import BaseModel
-from typing import Type
+
+from src.domain.schemas import ChatTurn, ToolSelection
+from src.domain.utils import to_dict
+from src.infrastructure.mcp import MCPClient
 
 
 class ChatService:
@@ -89,9 +88,9 @@ class ChatService:
     # Tool selection
     # -----------------------------
     def _resolve_tools(
-    self,
-    selection: ToolSelection,
-    names: Optional[Iterable[str]] = None,
+        self,
+        selection: ToolSelection,
+        names: Optional[Iterable[str]] = None,
     ) -> Optional[List[Dict[str, Any]]]:
         """Select which tools to expose for the current request.
 
@@ -178,6 +177,7 @@ class ChatService:
 
         if response_model is None:
             from src.domain.schemas import AzureOpenAIResponse as DefaultResponseModel
+
             response_model = DefaultResponseModel
 
         resp_obj = response_model.model_validate(payload)
@@ -188,7 +188,7 @@ class ChatService:
             self.add_turn("assistant", text)
 
         return text
-    
+
     def parse(
         self,
         *,
@@ -244,6 +244,7 @@ class ChatService:
 
         if parsed_response_model is None:
             from src.domain.schemas import AzureOpenAIParsedResponse as DefaultParsedModel
+
             parsed_response_model = DefaultParsedModel
 
         payload = to_dict(resp_dict)

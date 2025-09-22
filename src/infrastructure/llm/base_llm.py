@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Optional, Dict
+from typing import Any, Dict, Optional
 
 
 class BaseLLMProviderUnitOfWork(ABC):
@@ -37,4 +37,7 @@ class BaseLLMProviderUnitOfWork(ABC):
         instructions: Optional[str] = None,
         **kwargs: Any,
     ) -> Dict[str, Any]:
-        """Create and parse a response into a Pydantic model; subclasses may require `text_format` via kwargs."""
+        """
+        Create and parse a response into a Pydantic model;
+        subclasses may require `text_format` via kwargs.
+        """

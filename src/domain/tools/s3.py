@@ -1,4 +1,4 @@
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
 
 from botocore.exceptions import BotoCoreError, ClientError, NoCredentialsError
 
@@ -107,9 +107,4 @@ class S3MCPTool(BaseMCPTool):
 
 if __name__ == "__main__":
     server = S3MCPTool()
-    server.run(
-        transport="streamable-http",
-        host="0.0.0.0",
-        port=8000,
-        path="/mcp/s3"
-    )
+    server.run(transport="streamable-http", host="0.0.0.0", port=8000, path="/mcp/s3")

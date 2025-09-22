@@ -1,32 +1,38 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Literal, List, Optional, Any, Dict
-from pydantic import BaseModel, HttpUrl, ConfigDict
+from typing import Any, Dict, List, Literal, Optional
 
+from pydantic import BaseModel, ConfigDict, HttpUrl
 
 # ----------------------------- #
 # ---- Chat & Tool Schemas ---- #
 # ----------------------------- #
 
+
 class ToolSelection(BaseModel):
     """Represents how to choose which tools are exposed to the model for a call."""
+
     value: Literal["all", "none", "some"]
 
 
 class ChatTurn(BaseModel):
     """Represents a single message turn in the chat transcript."""
+
     role: Literal["system", "user", "assistant", "tool"]
     content: str
 
+
 # -------------------- #
-# ---- AWS Models ---- # 
+# ---- AWS Models ---- #
 # -------------------- #
 
 # ---- S3 ---- #
 
+
 class Bucket(BaseModel):
     """Represents a single S3 bucket."""
+
     Name: str
     CreationDate: datetime
     BucketRegion: str
@@ -51,22 +57,26 @@ class Bucket(BaseModel):
 
 class Owner(BaseModel):
     """Represents the owner of the S3 buckets."""
+
     DisplayName: str
     ID: str
 
 
 class ListS3BucketResponse(BaseModel):
     """Response model for listing S3 buckets."""
+
     Buckets: List[Bucket]
     Owner: Owner
     ContinuationToken: Optional[str]
     Prefix: Optional[str]
+
 
 # ------------------------- #
 # ---- Tool definition ---- #
 # ------------------------- #
 
 # ---- MCP ---- #
+
 
 class MCPToolConfig(BaseModel):
     """Configuration object for an MCP tool integration."""
@@ -77,11 +87,13 @@ class MCPToolConfig(BaseModel):
     allowed_tools: List[str]
     require_approval: Literal["never", "always", "prompt"]
 
+
 # ----------------------- #
 # ---- LLM Providers ---- #
 # ----------------------- #
 
 # ---- Base Class ---- #
+
 
 class BaseLLMResponse(BaseModel):
     """Provider-agnostic base for response payloads returned by LLMs."""
@@ -108,9 +120,11 @@ class BaseLLMParsedResponse(BaseModel):
     def _extract_text(self) -> Optional[str]:
         return None
 
+
 # ---- AzureOpenAI ---- #
 
 # -> Builders
+
 
 class AzureContentItem(BaseModel):
     type: str
@@ -124,6 +138,7 @@ class AzureOutputItem(BaseModel):
     Azure may interleave message items with tool events (e.g., tool_call/tool_result).
     Only message items are guaranteed to have role/status/content.
     """
+
     # Common
     id: str
     type: str
@@ -173,8 +188,10 @@ class AzureUsage(BaseModel):
 
 # -> OpenAI Response API
 
+
 class AzureOpenAIResponse(BaseLLMResponse):
     """Azure Responses API payload for /responses.create."""
+
     id: str
     object: str
     created_at: int
@@ -229,7 +246,9 @@ class AzureOpenAIResponse(BaseLLMResponse):
                     return c0.text
         return None
 
+
 # -> OpenAI Parse API
+
 
 class AzureOpenAIParsedResponse(AzureOpenAIResponse, BaseLLMParsedResponse):
     """Structured Outputs variant; includes provider-specific parsed fields when present."""

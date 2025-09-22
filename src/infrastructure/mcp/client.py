@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Any, Dict, Iterable, List, Optional, Sequence, Mapping, Type
+from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Type
+
 from pydantic import BaseModel
 
 from src.infrastructure.llm.base_llm import BaseLLMProviderUnitOfWork
@@ -53,7 +54,7 @@ class MCPClient:
         instructions: Optional[str] = None,
         tools: Optional[list[dict[str, Any]]] = None,
         **kwargs: Any,
-        ) -> Any:
+    ) -> Any:
         """Create a single-turn response using the injected LLM and resolved tools.
 
         The precedence for tools is: explicit arg `tools` > kwarg `tools` > self.tools.
@@ -81,7 +82,7 @@ class MCPClient:
         messages: Optional[Sequence[Mapping[str, Any]]] = None,
         tools: Optional[list[dict[str, Any]]] = None,
         **kwargs: Any,
-        ) -> Any:
+    ) -> Any:
         """Call provider `parse_response` with structured outputs and resolved tools.
 
         The precedence for tools is: explicit arg `tools` > kwarg `tools` > self.tools.

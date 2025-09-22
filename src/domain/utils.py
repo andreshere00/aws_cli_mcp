@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-from typing import Any, Dict
-from pydantic import BaseModel
 import json
+from typing import Any, Dict
+
+from pydantic import BaseModel
+
 from src.domain.schemas import AzureOpenAIResponse
 
 
@@ -55,7 +57,8 @@ def to_dict(value: Any) -> Dict[str, Any]:
         return json.loads(str(value))
     except Exception:
         return {"raw": str(value)}
-    
+
+
 def as_text(reply: Any) -> str:
     """
     Return assistant text regardless of whether `reply` is a string, model, or SDK object.
