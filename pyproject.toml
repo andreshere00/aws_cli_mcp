@@ -22,23 +22,31 @@ dev = [
     "pre-commit>=3.8.0",
     "ruff>=0.6.8",
     "poethepoet>=0.28.0",
+    "autoflake>=2.3.1",
 ]
 
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+
+[tool.isort]
+profile = "black"
+line_length = 100
+skip = [".venv", "build", "dist"]
+
+[tool.ruff]
+line-length = 100
+exclude = [".venv", "build", "dist"]
+
+[tool.flake8]
+max-line-length = 100
+
 [tool.poe.tasks]
-# Install all project dependencies (including dev if you have a uv lockfile with dev deps)
-install = { cmd = "uv sync" }
-
-# Install git hooks so they run automatically on commit
-pre-commit-install = { cmd = "uv run pre-commit install" }
-
-# Manually run all hooks against the entire repo (useful for CI or first run)
-pre-commit-run = { cmd = "uv run pre-commit run --all-files" }
-
-# Run the test suite (fast, minimal output)
-tests = { cmd = "uv run pytest -q" }
-
-# Run tests with coverage (prints missing lines)
-coverage = { cmd = "uv run pytest --maxfail=1 --disable-warnings --cov=src --cov-report=term-missing" }
-
-# Optional: a convenience task to set up everything at once
+install = { cmd = "uv sync", help = "Install project dependencies" }
+pre-commit-install = { cmd = "uv run pre-commit install", help = "Install pre-commit hooks" }
+pre-commit-run = { cmd = "uv run pre-commit run --all-files", help = "Run pre-commit" }
+tests = { cmd = "uv run pytest -q", help = "Execute tests" }
+coverage = { cmd = "uv run pytest --maxfail=1 --disable-warnings --cov=src --cov-report=term-missing", help = "Execute tests with coverage" }
 setup = { sequence = ["install", "pre-commit-install", "pre-commit-run"], help = "Install deps, set up hooks, lint all files once" }
+style = { cmd = "sh -c 'uv run autoflake --in-place --remove-all-unused-imports --remove-unused-variables --recursive src tests && uv run isort . && uv run black . && uv run ruff format . && uv run flake8 --config pyproject.toml src tests'", help = "Run autoflake, isort, black, ruff (fix), then flake8 with consistent 100-char limit" }
+clean = { cmd = "find . \\( -type d -name __pycache__ -exec rm -rf {} + \\) -o \\( -type f -name '*.py[co]' -delete \\)", help = "Clean all the temporal and cache-related iles" }

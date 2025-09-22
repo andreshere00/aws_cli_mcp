@@ -1,10 +1,13 @@
+from typing import Any, Dict, List, Optional
+
 import boto3
-from botocore.exceptions import BotoCoreError, NoCredentialsError, ClientError
+from botocore.exceptions import BotoCoreError, ClientError, NoCredentialsError
 from dotenv import load_dotenv
-from typing import Optional, List, Dict, Any
-from src.domain.schemas import ListS3BucketResponse, Bucket, Owner
+
+from src.domain.schemas import Bucket, ListS3BucketResponse, Owner
 
 load_dotenv()
+
 
 class S3UnitOfWork:
     """

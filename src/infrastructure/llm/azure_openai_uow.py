@@ -1,11 +1,13 @@
 import os
-from typing import Any, Literal, Optional, Sequence, Mapping, Type, Dict
-from pydantic import BaseModel
+from typing import Any, Dict, Literal, Mapping, Optional, Sequence, Type
+
 from dotenv import load_dotenv
 from openai import AzureOpenAI
 from openai.types import Metadata
+from pydantic import BaseModel
 
 load_dotenv()
+
 
 class AzureOpenAIUnitOfWork:
     """Unit of Work to wrap the Azure OpenAI Responses client with MCP tools support.
@@ -42,7 +44,7 @@ class AzureOpenAIUnitOfWork:
     def create_response(
         self,
         input: str,
-        model: str, 
+        model: str,
         instructions: Optional[str] = None,
         max_output_tokens: Optional[int] = None,
         metadata: Optional[Metadata] = None,
@@ -87,9 +89,9 @@ class AzureOpenAIUnitOfWork:
             tools=tools,
             tool_choice=tool_choice,
         )
-        
+
         return response
-    
+
     def parse_response(
         self,
         *,
@@ -111,7 +113,8 @@ class AzureOpenAIUnitOfWork:
 
         Args:
             text_format: A Pydantic model class describing the expected final output.
-            messages: Full message list (dicts with 'role' & 'content'). Use this OR (instructions + input).
+            messages: Full message list (dicts with 'role' & 'content'). Use this OR
+                (instructions + input).
             input: User text content if not providing a full messages list.
             instructions: System instructions if not providing a full messages list.
             model: Azure deployment name. Defaults to $AZURE_OPENAI_DEPLOYMENT.
@@ -159,8 +162,8 @@ class AzureOpenAIUnitOfWork:
         # Call the structured-outputs helper; the SDK validates into `output_parsed`.
         response = self.client.responses.parse(
             model=model,
-            input=list(messages),              # Responses API accepts the message list under "input"
-            text_format=text_format,           # <- the schema (Pydantic BaseModel subclass)
+            input=list(messages),  # Responses API accepts the message list under "input"
+            text_format=text_format,  # <- the schema (Pydantic BaseModel subclass)
             max_output_tokens=max_output_tokens,
             temperature=temperature,
             top_p=top_p,
@@ -170,5 +173,5 @@ class AzureOpenAIUnitOfWork:
             tool_choice=tool_choice,
             previous_response_id=previous_response_id,
         )
-        
+
         return response
