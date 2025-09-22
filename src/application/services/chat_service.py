@@ -160,11 +160,14 @@ class ChatService:
           The conversation history is updated with both the user turn and the
           assistant reply when text is successfully extracted.
         """
-        messages: List[Mapping[str, Any]] = self.history
-        messages.append({"role": "user", "content": prompt})
+        # 1) Append user turn immediately so history reflects the request
+        self.add_turn("user", prompt)
 
+        # 2) Build messages from current history (copy) and resolve tools
+        messages: List[Mapping[str, Any]] = self.history
         tools = self._resolve_tools(tool_selection, tool_names)
 
+        # 3) Call provider
         resp_dict = self.client.create_response(
             input=messages,
             model=model,
@@ -173,6 +176,7 @@ class ChatService:
             **kwargs,
         )
 
+        # 4) Normalize and validate
         payload = to_dict(resp_dict)
 
         if response_model is None:
@@ -183,8 +187,8 @@ class ChatService:
         resp_obj = response_model.model_validate(payload)
         text = resp_obj.extract_text()
 
+        # 5) Append assistant turn only if we have non-empty text
         if text:
-            self.add_turn("user", prompt)
             self.add_turn("assistant", text)
 
         return text
