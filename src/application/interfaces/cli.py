@@ -34,9 +34,8 @@ from pydantic import BaseModel
 
 from src.application.services.chat_service import ChatService
 from src.domain.schemas import ToolSelection
-from src.infrastructure.mcp import MCPClient
 from src.domain.utils import as_text
-
+from src.infrastructure.mcp import MCPClient
 
 DEFAULT_SYSTEM = "Respond the user queries based on the provided tools"
 DEFAULT_TOOLS_PATH = "tools.json"
@@ -45,6 +44,7 @@ DEFAULT_TOOLS_PATH = "tools.json"
 # -----------------------------
 # Utilities
 # -----------------------------
+
 
 def _load_tools_file(path: str) -> List[Dict[str, Any]]:
     """Load MCP tool specs from a JSON file (list or single dict)."""
@@ -67,7 +67,8 @@ def _load_tools_file(path: str) -> List[Dict[str, Any]]:
         return [d for d in data if isinstance(d, dict)]
 
     raise SystemExit(
-        f"Tools file '{path}' must contain a JSON object or an array of objects (got {type(data).__name__})."
+        f"Tools file '{path}' must contain a JSON object or an "
+        f"array of objects (got {type(data).__name__})."
     )
 
 
@@ -100,6 +101,7 @@ def _build_client(tools_path: str) -> MCPClient:
     """Wire an LLM UoW (provider-specific) and tool specs into an MCPClient (agnostic)."""
     # Lazily import to keep interface layer provider-agnostic
     from src.infrastructure.llm import AzureOpenAIUnitOfWork
+
     llm = AzureOpenAIUnitOfWork()  # reads env for endpoint/key/version
     tool_specs = _load_tools_file(tools_path)
     client = MCPClient(llm=llm, tools=tool_specs, default_model=None)
@@ -109,6 +111,7 @@ def _build_client(tools_path: str) -> MCPClient:
 # -----------------------------
 # Subcommand implementations
 # -----------------------------
+
 
 def cmd_chat(args: argparse.Namespace) -> int:
     """Interactive chat with optional LLM kwargs."""
@@ -198,6 +201,7 @@ def cmd_parse(args: argparse.Namespace) -> int:
 # CLI wiring
 # -----------------------------
 
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="mcp-chat",
@@ -219,7 +223,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p_chat.add_argument(
         "--llm-params",
-        help="JSON object of LLM kwargs, e.g. '{\"temperature\":0.2,\"max_output_tokens\":800}'.",
+        help='JSON object of LLM kwargs, e.g. \'{"temperature":0.2,"max_output_tokens":800}\'.',
     )
     p_chat.set_defaults(func=cmd_chat)
 
@@ -237,7 +241,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p_parse.add_argument(
         "--llm-params",
-        help="JSON object of LLM kwargs, e.g. '{\"temperature\":0.0,\"max_output_tokens\":400}'.",
+        help='JSON object of LLM kwargs, e.g. \'{"temperature":0.0,"max_output_tokens":400}\'.',
     )
     p_parse.add_argument(
         "--output-format",

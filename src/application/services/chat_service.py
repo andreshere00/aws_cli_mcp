@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from typing import Any, Dict, Iterable, List, Literal, Mapping, Optional, Sequence
-
-from src.infrastructure.mcp import MCPClient
-from src.domain.schemas import ChatTurn, ToolSelection
-from src.domain.utils import to_dict
+from typing import Any, Dict, Iterable, List, Literal, Mapping, Optional, Sequence, Type
 
 from pydantic import BaseModel
-from typing import Type
+
+from src.domain.schemas import ChatTurn, ToolSelection
+from src.domain.utils import to_dict
+from src.infrastructure.mcp import MCPClient
 
 
 class ChatService:
@@ -89,9 +88,9 @@ class ChatService:
     # Tool selection
     # -----------------------------
     def _resolve_tools(
-    self,
-    selection: ToolSelection,
-    names: Optional[Iterable[str]] = None,
+        self,
+        selection: ToolSelection,
+        names: Optional[Iterable[str]] = None,
     ) -> Optional[List[Dict[str, Any]]]:
         """Select which tools to expose for the current request.
 
@@ -161,11 +160,14 @@ class ChatService:
           The conversation history is updated with both the user turn and the
           assistant reply when text is successfully extracted.
         """
-        messages: List[Mapping[str, Any]] = self.history
-        messages.append({"role": "user", "content": prompt})
+        # 1) Append user turn immediately so history reflects the request
+        self.add_turn("user", prompt)
 
+        # 2) Build messages from current history (copy) and resolve tools
+        messages: List[Mapping[str, Any]] = self.history
         tools = self._resolve_tools(tool_selection, tool_names)
 
+        # 3) Call provider
         resp_dict = self.client.create_response(
             input=messages,
             model=model,
@@ -174,21 +176,23 @@ class ChatService:
             **kwargs,
         )
 
+        # 4) Normalize and validate
         payload = to_dict(resp_dict)
 
         if response_model is None:
             from src.domain.schemas import AzureOpenAIResponse as DefaultResponseModel
+
             response_model = DefaultResponseModel
 
         resp_obj = response_model.model_validate(payload)
         text = resp_obj.extract_text()
 
+        # 5) Append assistant turn only if we have non-empty text
         if text:
-            self.add_turn("user", prompt)
             self.add_turn("assistant", text)
 
         return text
-    
+
     def parse(
         self,
         *,
@@ -244,6 +248,7 @@ class ChatService:
 
         if parsed_response_model is None:
             from src.domain.schemas import AzureOpenAIParsedResponse as DefaultParsedModel
+
             parsed_response_model = DefaultParsedModel
 
         payload = to_dict(resp_dict)

@@ -1,5 +1,9 @@
 # AWS CLI MCP
 
+<center>
+<img src="assets/aws_mcp_logo.svg" alt="AWS Logo" width=60% >
+</center>
+
 An AI-powered agent to execute Amazon Web Services (AWS) CLI instructions using a server based on the Model Context Protocol (MCP).
 
 ## Prerequisites
