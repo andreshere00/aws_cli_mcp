@@ -23,22 +23,26 @@ repos:
       - id: check-yaml
       - id: check-json
 
-  # - repo: local
-  #   hooks:
-  #     - id: check-test-coverage
-  #       name: Test coverage (>=75%)
-  #       entry: |
-  #         bash -c '
-  #         export GENAI_ENVIRONMENT=test
-  #         uv run coverage run -m pytest --junitxml=xunit-result.xml
-  #         TOTAL=$(uv run coverage report | awk "/^TOTAL/ { gsub(/%/,\"\"); print \$4 }")
-  #         echo "Total coverage: ${TOTAL}%"
-  #         if (( $(echo "$TOTAL < 75" | bc -l) )); then
-  #           echo "ERROR: Coverage ${TOTAL}% is below 75% threshold."
-  #           exit 1
-  #         fi
-  #         '
-  #       language: system
-  #       pass_filenames: false
-  #       always_run: true
-  #       require_serial: true
+  - repo: local
+    hooks:
+      - id: check-test-coverage
+        name: Test coverage (>=75%)
+        entry: |
+          bash -euo pipefail -c '
+            export GENAI_ENVIRONMENT=test
+            export COVERAGE_FILE=".git/.coverage"               # keep coverage DB out of the tree
+            # Run tests; no junit xml output in the repo
+            uv run coverage run -m pytest -q
+            # Parse total percentage from coverage report
+            TOTAL=$(uv run coverage report | awk "/^TOTAL/ { gsub(/%/, \"\"); print \$4 }")
+            echo "Total coverage: ${TOTAL}%"
+            # Enforce threshold
+            if (( $(echo "$TOTAL < 75" | bc -l) )); then
+              echo "ERROR: Coverage ${TOTAL}% is below 75% threshold."
+              exit 1
+            fi
+          '
+        language: system
+        pass_filenames: false
+        always_run: true
+        require_serial: true
